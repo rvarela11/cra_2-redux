@@ -3,42 +3,50 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+// @material-ui
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 // @actions
-import { getAllData } from '../../actions/index';
+import { fetchLocations } from '../../actions/index';
+
+// @components
+import Locations from '../Locations/Locations';
 
 // @styles
 import './App.scss';
 
 class App extends Component {
     componentDidMount() {
-        const { getAllData } = this.props;
-        fetch('locations.json')
-            .then(res => res.json())
-            .then(data => getAllData(data))
-            .catch(error => console.log(error));
+        const { fetchLocations } = this.props;
+        fetchLocations();
     }
 
     render() {
-        const { apiDataAllFiltered } = this.props;
+        const { fetchLocationsLoading } = this.props;
+        if (fetchLocationsLoading) {
+            return (
+                <div className="circular-progress">
+                    <CircularProgress />
+                </div>
+            );
+        }
         return (
-            <div className="locations__list">
-                { apiDataAllFiltered.map(item => <p key={item.id}>{item.name}</p>)}
-            </div>
+            <Locations />
         );
     }
 }
 
 const mapDispatchToProps = dispatch => ({
-    getAllData: apiData => dispatch(getAllData(apiData))
+    fetchLocations: () => dispatch(fetchLocations())
 });
 
 const mapStateToProps = state => ({
-    apiDataAllFiltered: state.apiDataAllFiltered
+    fetchLocationsLoading: state.fetchLocationsLoading
 });
 
 App.propTypes = {
-    apiDataAllFiltered: PropTypes.array.isRequired,
-    getAllData: PropTypes.func.isRequired
+    fetchLocations: PropTypes.func.isRequired,
+    fetchLocationsLoading: PropTypes.bool.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
